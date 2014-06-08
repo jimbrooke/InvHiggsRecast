@@ -9,16 +9,34 @@ C...Pythia parameters
       COMMON/PYPARS/MSTP(200),PARP(200),MSTI(200),PARI(200)
       COMMON/PYDAT3/MDCY(500,3),MDME(8000,2),BRAT(8000),KFDP(8000,5)
 
+      INTEGER MAXNUP
+      PARAMETER (MAXNUP=500)
+      INTEGER NUP,IDPRUP,IDUP,ISTUP,MOTHUP,ICOLUP
+      DOUBLE PRECISION XWGTUP,SCALUP,AQEDUP,AQCDUP,PUP,VTIMUP,SPINUP
+      COMMON/HEPEUP/NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP,IDUP(MAXNUP),
+     &     ISTUP(MAXNUP),MOTHUP(2,MAXNUP),ICOLUP(2,MAXNUP),PUP(5,MAXNUP)
+c     &     VTIMUP(MAXNUP),SPINUP(MAXNUP)
 C...EXTERNAL statement links PYDATA on most machines.
       CHARACTER*3 chlun
       EXTERNAL PYDATA
 
 C-------------------------- PYTHIA SETUP -----------------------------
+      
 
 C...1) Open LHEF file on unit LUN, and tell Pythia where to find it.
       LUN=88
       OPEN(LUN,FILE='VBF_inv_LHEs/event_gf_inv_14000.lhe')
+ 15   OPEN(20, FILE='pythia_events.lhe')
       WRITE(CHLUN,'(I3)') LUN
+      WRITE(20, '(a)') '<LesHouchesEvents version="1.0">'
+c      WRITE(20,'(a)') '<init>'
+c      WRITE(20,'(2i6,2E12.5,2i2,2i6,2i2)')
+c     $     K(1,2),K(2,2),P(1,4),P(2,4),0,0,
+c     $     0,0,3,1
+c      WRITE(20,'(3E12.5,i4)')
+c     $     stdxsec,0d0,1d0,100
+c      WRITE(20,'(a)') '</init>'
+      
       CALL PYGIVE('MSTP(161)='//CHLUN)
       CALL PYGIVE('MSTP(162)='//CHLUN)
 
@@ -75,13 +93,12 @@ C...Else count up number of generated events
 C...Print first event, both LHEF input and Pythia output.
       IF(IEV.LE.1) THEN   !. Event 1
         CALL PYLIST(7)
-c        CALL PYLIST(2)
+        CALL PYLIST(2)
       ENDIF
 
 C.../PYJETS/ now contains a fully generated event.
 C...Insert user analysis here (or save event to output) 
 C...(example: count charged multiplicity)
-
 
       MSTP(111)=1    !. Should allow hadronisation 
       MSTP(61)=1
@@ -91,21 +108,25 @@ C...(example: count charged multiplicity)
       MSTP(81)=20    !. Multiple interactions
 
 
+
+      WRITE(20,'(a)') '<event>'
+      WRITE(20,'(I3,I4,4E16.8)')
+     $     NUP,100,1d0,0d0,0d0,0d0
+      DO I=1,NUP
+         WRITE(20,'(I8,I3,2I3,2I2,5E16.8,2F3.0)')
+     $        IDUP(I),ISTUP(I),MOTHUP(1,I),MOTHUP(2,I),0,0,
+     $        (PUP(J,I),J=1,5),0d0,0d0
+      ENDDO
+      WRITE(20,'(a)') '</event>'
+
+
 C...Loop back to look for next event
       GOTO 100
 
 C...Jump point when end-of-file reached (or other problem encountered)
 C...Print final statistics.
- 999    CALL PYSTAT(2)
+ 999  CALL PYSTAT(2)
 
 
-c      DNAVG=DNSUM/IEV
-c      DNRMS=SQRT(DN2SUM/IEV)
-c      SIGMA2=MAX(0D0,DNRMS**2-DNAVG**2)
-c     WRITE(*,'(1x,A,1x,F6.1,5x,A,1x,F6.1)') 
-c   &    'Invisible Higgs samples decayed, please see above for event listing <Nch> =', 
-c  &    DNAVG, '+/-',SQRT(SIGMA2/IEV)
-c  PRINT*
-c
         PRINT *, "Samples decayed, please see above for event listing"
       END
