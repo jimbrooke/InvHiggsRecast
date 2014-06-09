@@ -69,7 +69,9 @@ c      WRITE(20,'(a)') '</init>'
       CALL PYGIVE('MDME(186,1)=0') ! Z0->tau-tau+ off.
       CALL PYGIVE('MDME(187,1)=1') ! Z0->nu_tau_nu_taubar ON.
 
+      
 C...2) Initialize Pythia for user process  
+
       CALL PYINIT('USER',' ',' ',0D0)
 
 C------------------------- GENERATE EVENTS ---------------------------
@@ -79,6 +81,14 @@ C...Initial values for number of events and cumulative charged multiplicity
       DNSUM=0D0
       DN2SUM=0D0
 
+      MSTP(111)=0               !. Should allow hadronisation 
+      MSTP(61)=0
+      MSTP(71)=0
+      MSTP(161)=0
+      MSTP(164)=0
+      MSTP(81)=0               !. Multiple interactions
+
+
 C...Get next event from file and process it
  100    CALL PYEVNT
 
@@ -86,6 +96,14 @@ C...If event generation failed, quit loop
       IF(MSTI(51).EQ.1) THEN
         GOTO 999
       ENDIF
+
+c      MSTP(111)=1               !. Should allow hadronisation 
+c      MSTP(61)=1
+c      MSTP(71)=1
+c      MSTP(161)=1
+c      MSTP(164)=1
+c      MSTP(81)=20               !. Multiple interactions
+
 
 C...Else count up number of generated events
       IEV=IEV+1
@@ -100,12 +118,12 @@ C.../PYJETS/ now contains a fully generated event.
 C...Insert user analysis here (or save event to output) 
 C...(example: count charged multiplicity)
 
-      MSTP(111)=1    !. Should allow hadronisation 
-      MSTP(61)=1
-      MSTP(71)=1
-      MSTP(161)=1
-      MSTP(164)=1
-      MSTP(81)=20    !. Multiple interactions
+c      MSTP(111)=1    !. Should allow hadronisation 
+c      MSTP(61)=1
+c      MSTP(71)=1
+c      MSTP(161)=1
+c      MSTP(164)=1
+c      MSTP(81)=20    !. Multiple interactions
 
 
 
@@ -125,7 +143,7 @@ C...Loop back to look for next event
 
 C...Jump point when end-of-file reached (or other problem encountered)
 C...Print final statistics.
- 999  CALL PYSTAT(2)
+ 999  CALL PYSTAT(1)
 
 
         PRINT *, "Samples decayed, please see above for event listing"
