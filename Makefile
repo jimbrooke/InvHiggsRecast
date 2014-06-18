@@ -1,7 +1,7 @@
-decaylhe: decaylhe.o main.o writeevent.o pythia-6.4.28.o
-	g++ -o decaylhe decaylhe.o main.o writeevent.o pythia-6.4.28.o -L$(EXTERNAL)/lib -lHepMC -lHepMCfio -lgfortran
+decaylhe: decaylhe.o main.o writeevent.o pythia.o
+	g++ -o decaylhe decaylhe.o main.o writeevent.o pythia.o -L$(EXTERNAL)/lib -lHepMC -lHepMCfio -lgfortran
 
-pythia-6.4.28.o: pythia-6.4.28.f
+pythia.o: pythia-6.4.28.f
 	gfortran -c pythia-6.4.28.f
 
 decaylhe.o: decaylhe.f
